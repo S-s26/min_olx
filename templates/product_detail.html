@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}<title>Product Details</title>{% endblock %}
+
+{% block content %}
+<!-- product_detail.html -->
+<div style="max-width: 800px; margin: auto; padding: 20px;">
+    <h2>{{ product.title }}</h2>
+    
+    <div class="image-row" style="display: flex; gap: 10px; overflow-x: auto; margin-top: 10px;">
+        {% for img in product.images.all %}
+        <img src="{{ img.image.url }}" alt="Image" style="width: 200px; height: 150px; object-fit: cover; border-radius: 8px;">
+        {% endfor %}
+    </div>
+
+    <div style="margin-top: 20px;">
+        <p><strong>Price:</strong> ₹{{ product.price }}</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Seller:</strong> {{ product.seller.first_name }}</p>
+        <p><strong>Uploaded:</strong> {{ product.created_at|date:"M d, Y H:i" }}</p>
+        <a href="/" style="margin-top: 10px; display: inline-block; background-color: #28a745; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none;">Back to Home</a>
+        <a href="{% url "start_chat" product.id %}" style="margin-top: 10px; display: inline-block; background-color: #28a745; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none;">sStart Chat{{product.id}}</a>
+    </div>
+</div>
+{% endblock content %}
+
