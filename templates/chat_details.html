@@ -1,0 +1,210 @@
+<!-- chat/templates/chat/chat_detail.html -->
+{% extends "base.html" %}
+{% block title %}<title>Chat</title>{% endblock title %}
+{% block css %}
+<style>
+    
+    .chat-box {
+        position:relative;
+        max-width: 800px;
+        max-height: 600px;
+       
+        margin:auto;
+       
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        background-color: #fdfdfd;
+        cursor:pointer;
+    }
+    .message-nav{
+        height:70px;
+        margin-bottom: 20px;
+        position: sticky;
+        top: 0%;
+        background-color:pink;
+    }
+    #message-box{ 
+        padding: 20px;
+       max-height:400px;
+        overflow-y: auto;
+       
+    }
+    .message-nav a{
+        display:inline-block;
+        color:black;
+        font-weight: bolder;
+        text-decoration: none;
+        float: left;
+        z-index: 1000;
+    }
+    .chat-box h1{
+    
+        text-align: center;
+    
+    }
+     .chat-box h2{
+        display: inline-block;
+        {% comment %} background-color:rgb(150, 150, 218); {% endcomment %}
+        
+        {% comment %} zindx:1; {% endcomment %}
+    }
+
+    .message {
+        width: fit-content;
+        margin-bottom: 12px;
+        display: flex;
+        
+        flex-direction: column;
+       max-width: 60%;
+       overflow-wrap: break-word;
+
+    }
+
+    .sent {
+       
+        {% comment %} align-self: flex-end; {% endcomment %}
+        justify-self: flex-end;
+        background-color: #dcf8c6;
+        border-radius: 12px 12px 0 12px;
+        padding: 10px;
+    }
+
+    .received {
+        {% comment %} align-self: flex-start; {% endcomment %}
+        justify-self: flex-start;
+        background-color: #eee;
+        border-radius: 12px 12px 12px 0;
+        padding: 10px;
+    }
+
+    .timestamp {
+        font-size: 12px;
+        color: #777;
+        text-align: right;
+    }
+    .message-form{
+        position:sticky;
+        bottom: 10px;
+        padding:15px;
+         background-color: #fdfdfd;
+    }
+    .chat-form {
+        display: flex;
+       
+       
+
+
+        gap: 10px;
+        {% comment %} margin-top: 20px; {% endcomment %}
+    }
+
+    .chat-form input[type="text"] {
+        flex: 1;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+
+    .chat-form input[type="submit"] {
+        padding: 10px 20px;
+        border-radius: 6px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+</style>
+{% endblock css %}
+
+
+{% block content %}
+{% comment %} <h2>Chat about {{ conversation.product.title }}</h2>
+<div class="chat-box">
+    {% for message in messages %}
+        <p><strong>{{ message.sender.username }}</strong>: {{ message.message }} <em>{{ message.timestamp }}</em></p>
+    {% endfor %}
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="text" placeholder="Type your message..." required>
+    <button type="submit">Send</button>
+</form> {% endcomment %}
+
+<div class="chat-box">
+     
+    <div class=message-nav>
+   <a href="{% url "chat_list" %}">⬅Back</a>
+    <h1>Chat about {{ conversation.product.title }}</h1>
+    <h2>Chat with {% if conversation.seller == request.user %}{{conversation.buyer.first_name}}{% else %}{{ conversation.seller.username }}{% endif %} </h2>
+    </div>
+<div id="message-box">
+    {% for msg in messages %}
+        <div class="message {% if msg.sender == request.user %}sent{% else %}received{% endif %}">
+            <p>{{ msg.message }}</p>
+            <div class="timestamp">{{ msg.timestamp|date:"d M Y, h:i A" }}</div>
+        </div>
+    {% empty %}
+        <p>No messages yet.</p>
+    {% endfor %}
+    </div>
+<div class="message-form">
+    <form class="chat-form" id="chat-form"method="post">
+        {% csrf_token %}
+        <input type="text" name="text" id="chat-input" placeholder="Type your message..." required>
+        <input type="submit" value="Send">
+    </form>
+
+</div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+function scrollToBottom() {
+    const chatBox = document.getElementById("message-box");
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    scrollToBottom();  // Auto scroll when page loads
+
+    const form = document.getElementById("chat-form");
+    const inputm = document.getElementById("chat-input");
+    {% comment %} const chatBox = document.getElementById("chat-box"); {% endcomment %}
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    form.addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        const messageText = inputm.value.trim();
+        if (!messageText) return;
+
+        try {
+            console.log("this is try runn")
+            const response = await fetch("{% url "chat_detail" conversation.id %}", {
+                method: "POST",
+                headers:{
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": csrfToken,
+                },
+                 {% comment %} body:`text=${encodeURIComponent(messageText)}` {% endcomment %}
+                 body: new URLSearchParams({
+                    text: messageText,
+                }), 
+            });
+
+            if (response.ok) {
+                const html = await response.text();
+                document.open();
+                document.write(html);
+                document.close();
+            } else {
+                console.error("Message send failed.");
+            }
+        } catch (error) {
+            console.error("AJAX Error:", error);
+        }
+    });
+});
+</script>
+{% endblock script %}

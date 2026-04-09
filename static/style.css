@@ -1,0 +1,273 @@
+* {
+    margin: 0px;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#nav-bar {
+    width: 100vw;
+    /* min-height: 10vw; */
+    background-color: rgb(155, 81, 224);
+    display: flex;
+    padding: 1rem 2rem;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0px 0px 5px gray;
+    position: sticky;
+    top: 0px
+}
+
+.logo img {
+    width: 6vw;
+}
+
+.search-box {
+    display: flex;
+    border: 3px solid rgb(133, 133, 133);
+    border-radius: 5px;
+    /* height: 2.7rem; */
+    height: 50px;
+}
+
+#search {
+    border: none;
+    /* height: 50px; */
+    width: 32vw;
+    border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
+    font-size: 1.3rem;
+    padding: 5px;
+}
+
+.search-box:hover {
+    border: 2px solid black;
+}
+
+#search:focus {
+    outline: none;
+}
+
+.search-icon {
+    /* height: 50px; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(26, 215, 232);
+    width: 40px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+
+}
+
+footer {
+    background-color: #f8f9fa;
+    padding: 2rem;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.footer-container {
+    max-width: 80vw;
+    margin: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: space-between;
+}
+
+.footer-section {
+    flex: 1 1 300px;
+}
+
+.footer-section h4 {
+    margin-bottom: 0.75rem;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-links a {
+    text-decoration: none;
+    color: #333;
+}
+
+.contact-form input {
+    width: 100%;
+    padding: 0.6rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.contact-form button {
+    padding: 0.6rem 1.2rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.footer-disclaimer {
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.footer-socials {
+    margin-top: 1rem;
+}
+
+.footer-socials a {
+    margin-right: 10px;
+    text-decoration: none;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.footer-bottom {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    text-align: center;
+    color: #777;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ************login and signup css************* */
+#signup {
+    margin: 50px;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+
+
+}
+
+#signup form {
+    /* width: 50%; */
+    display: flex;
+    flex-direction: column;
+
+}
+
+#signup form input {
+    height: 30px;
+    margin-bottom: 1.5rem;
+}
+
+#signup form input[type="submit"] {
+    padding: 5px 10px;
+    margin: 0px 10px;
+    cursor: pointer;
+    background-color: rgb(180, 145, 212);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media (max-width: 700px) {
+    .footer-container {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    #nav-bar {
+        display: grid;
+        grid-template-columns: auto auto;
+        justify-content: space-between;
+    }
+
+    .logo {
+        width: 20vw;
+    }
+
+    .logo img {
+        width: 100%;
+    }
+
+    .search-box {
+        /* height:0px; */
+        width: 80vw;
+        grid-row-start: 2;
+        grid-column-start: 1;
+        grid-column-end: 3;
+    }
+
+    #search {
+        border: none;
+        /* height:50px; */
+        width: 90%;
+    }
+}

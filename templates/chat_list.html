@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Chat List </h2>
+<div class="chat-box">
+    {% for conversation in chatroom %}
+        <a href="{% url "chat_detail" conversation.id %}" style="text-decoration: none; color: inherit;">
+            <div class="chat-item" style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
+                <h3>{{ conversation.product.title }}</h3>
+                <p>Last message: {{ conversation.last_message.message }}</p>
+                <p>Seller: {{ conversation.product.seller.first_name }}</p>
+                <p>Chat started at: {{ conversation.created_at|date:"M d, Y H:i" }}</p>
+            </div>
+    {% endfor %}
+</div>
+
+
+{% endblock %}

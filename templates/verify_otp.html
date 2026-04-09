@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %} <title> verification </title>{% endblock title %}
+{% block content %}
+<h2>Verify OTP</h2>
+<form method="post">
+  {% csrf_token %}
+  <label for="otp">Enter OTP:</label>
+  <input type="text" name="otp" required>
+  <button type="submit">Verify</button>
+</form>
+
+{% if error %}
+<p style="color: red;">{{ error }}</p>
+{% endif %}
+
+{% endblock content %}

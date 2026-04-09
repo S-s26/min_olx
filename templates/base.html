@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}{% endblock title %}  
+  
+   <link rel="stylesheet" href={% static "style.css" %}>
+   {% block css %}{% endblock css %}
+
+</head>
+<body>
+    <header>
+        <div id="nav-bar">
+            <div class="logo">
+                <img src="assets/logo2.png" alt="logo ">
+            </div>
+            <div class="search-box">
+                <input type="search" placeholder="search products" id="search">
+                <div class="search-icon"><span id="search-iconb">🔍</span>
+                    <!-- <i class="ri-search-line">🔍</i> -->
+                </div>
+            </div>
+            <div id="login-out">
+                {% if user.is_authenticated %}
+                <a href="{% url 'add_product' %}">Post Your Product</a>
+                <a href="{% url 'my_products' %}">my Product</a>
+                <a href="{% url 'chat_list' %}">CHAT</a>
+
+
+                <a href="{% url 'logout' %}">{{user.first_name}}</a>
+                {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                {% endif %}
+                           </div>
+        </div>
+   </header>
+
+    <main>
+        {% block content %}{% endblock content %}
+        
+    </main>
+    
+   <footer>
+    <div class="footer-container">
+        <!-- Section 1: Info -->
+        <div class="footer-section">
+          <h3>Mini oLx</h3>
+          <p>Connecting buyers and sellers near you .<br> Every item has a second Chance <br>Find what you need . sell what you don't. <br> Buy smart. sell fast. Live easy. <br>Your local marketplace in your pocket <br> </p>
+          <ul class="footer-links">
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/privacy-policy">Privacy Policy</a></li>
+            <li><a href="/terms">Terms & Conditions</a></li>
+          </ul>
+        </div>
+    
+        <!-- Section 2: Contact Form -->
+        <div class="footer-section">
+          <h4>Contact Us</h4>
+          <form class="contact-form" action="/submit-contact" method="POST">
+            <input type="text" name="name" placeholder="Your Name" required />
+            <input type="email" name="email" placeholder="Your Email" required />
+            <input type="tel" name="phone" placeholder="Your Phone Number" required />
+            <button type="submit">Submit</button>
+          </form>
+        </div>
+      </div>
+    
+      <p class="footer-disclaimer">
+        <!-- Disclaimer: CompareKart is a third-party platform that fetches data from trusted e-commerce websites via APIs. Prices and availability may vary and are subject to change without notice. -->
+      </p>
+    
+      <div class="footer-socials">
+        <a href="#"><i class="ri-facebook-box-fill"></i></a>
+        <a href="#"><i class="ri-twitter-x-line"></i></a>
+        <a href="#"><i class="ri-instagram-fill"></i></a>
+      </div>
+    
+      <p class="footer-bottom">&copy; 2025 Mini oLx. All rights reserved.</p>
+   </footer>
+    {% block script %}{% endblock script %}
+</body>
+</html>
