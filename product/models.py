@@ -40,19 +40,19 @@ class ProductImage(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-        img_path = self.image.url
-        img = Image.open(img_path)
+        # img_path = self.image.url
+        # img = Image.open(img_path)
 
-        # --- STEP 3: Resize JPG/PNG ---
-        if img.height > 800 or img.width > 800:
-            output_size = (800, 800)
-            img.thumbnail(output_size)
-            img.save(img_path, optimize=True, quality=70)  # JPG/PNG compression
+        # # --- STEP 3: Resize JPG/PNG ---
+        # if img.height > 800 or img.width > 800:
+        #     output_size = (800, 800)
+        #     img.thumbnail(output_size)
+        #     img.save(img_path, optimize=True, quality=70)  # JPG/PNG compression
 
-        # --- STEP 4: Save as WebP also ---
-        filename, ext = os.path.splitext(img_path)
-        webp_path = f"{filename}.webp"
-        img.save(webp_path, "WEBP", quality=70)
+        # # --- STEP 4: Save as WebP also ---
+        # filename, ext = os.path.splitext(img_path)
+        # webp_path = f"{filename}.webp"
+        # img.save(webp_path, "WEBP", quality=70)
 
 
 
