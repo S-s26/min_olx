@@ -138,8 +138,7 @@ STATICFILES_DIRS=[
     BASE_DIR / "static",
 ]
 STATIC_ROOT =os.path.join (BASE_DIR ,'staticfiles')
-if not DEBUG:
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -176,7 +175,14 @@ CLOUDINARY_STORAGE = {
     'API_KEY':config('CLOUD_API_KEY'),
     'API_SECRET':config('CLOUD_API_SECRET'),
 }
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+STORAGES = {
+    'default': {
+        'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
