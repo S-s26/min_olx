@@ -40,7 +40,7 @@ class ProductImage(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-        img_path = self.image.path
+        img_path = self.image.url
         img = Image.open(img_path)
 
         # --- STEP 3: Resize JPG/PNG ---
