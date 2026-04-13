@@ -113,13 +113,17 @@ def signup(request):
             form = customUserForm(request.POST)
             if form.is_valid():
                 otp = str(random.randint(100000, 999999))
-                send_mail(
-                    subject='Your OTP for Mini-Olex Signup',
-                    message=f'Your OTP is: {otp}',
-                    from_email='Mini-Olex <kyobatau6@gmail.com>',
-                    recipient_list=[form.cleaned_data['email']],
-                    fail_silently=False,
-                )
+                try:
+                    send_mail(
+                        subject='Your OTP for Mini-Olex Signup',
+                        message=f'Your OTP is: {otp}',
+                        from_email='Mini-Olex <kyobatau6@gmail.com>',
+                        recipient_list=[form.cleaned_data['email']],
+                        fail_silently=False,
+                    )
+                except Exception as e:
+                    print(f"bhai mail nahi ja raha hai error ye hai {e}")
+                    print(f"otp is {otp}")
                 request.session['otp'] = otp
                 print("OTP sent to email:", otp)
                 request.session['form_data'] = request.POST.dict()
