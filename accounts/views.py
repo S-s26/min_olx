@@ -122,7 +122,7 @@ def signup(request):
                 )
                 request.session['otp'] = otp
                 print("OTP sent to email:", otp)
-                request.session['form_data'] = request.POST
+                request.session['form_data'] = request.POST.dict()
                 return render(request, 'signup.html', {'form': form, 'otp_sent': True})
     else:
          list_display={'username':'','first_name':'','last_name':'','email':'','phone':'','address':''}
