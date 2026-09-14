@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}<title>My activity — Mini-oLx</title>{% endblock %}
+
+{% block content %}
+<section class="molx-section">
+    <div class="molx-container" style="max-width: 760px;">
+        <div class="molx-flex molx-flex--between" style="margin-bottom: 1.5rem;">
+            <div>
+                <h1 style="margin: 0;">My activity</h1>
+                <p style="color: var(--c-text-muted); margin: .25rem 0 0;">
+                    Everything you've done on Mini-oLx, in one place.
+                </p>
+            </div>
+            <a href="{% url 'home' %}" class="molx-btn molx-btn--ghost">← Home</a>
+        </div>
+
+        {% if activities %}
+            <ol class="molx-activity">
+                {% for a in activities %}
+                <li class="molx-activity__item">
+                    <div class="molx-activity__icon">{{ a.icon }}</div>
+                    <div class="molx-activity__body">
+                        <div class="molx-activity__title">{{ a.title }}</div>
+                        {% if a.detail %}
+                            <div class="molx-activity__detail">{{ a.detail }}</div>
+                        {% endif %}
+                        <div class="molx-activity__time">{{ a.created_at|date:"M d, Y · h:i A" }}</div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ol>
+        {% else %}
+            <div class="molx-card" style="padding: 3rem; text-align: center;">
+                <div style="font-size: 3rem;">📜</div>
+                <h2>Nothing here yet</h2>
+                <p style="color: var(--c-text-muted);">
+                    Post a product or chat with a seller — your activity will show up here.
+                </p>
+                <a href="{% url 'add_product' %}" class="molx-btn molx-btn--primary">＋ Post a product</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

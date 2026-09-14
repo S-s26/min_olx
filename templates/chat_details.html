@@ -1,210 +1,170 @@
-<!-- chat/templates/chat/chat_detail.html -->
 {% extends "base.html" %}
-{% block title %}<title>Chat</title>{% endblock title %}
-{% block css %}
-<style>
-    
-    .chat-box {
-        position:relative;
-        max-width: 800px;
-        max-height: 600px;
-       
-        margin:auto;
-       
-        border: 2px solid #ddd;
-        border-radius: 8px;
-        background-color: #fdfdfd;
-        cursor:pointer;
-    }
-    .message-nav{
-        height:70px;
-        margin-bottom: 20px;
-        position: sticky;
-        top: 0%;
-        background-color:pink;
-    }
-    #message-box{ 
-        padding: 20px;
-       max-height:400px;
-        overflow-y: auto;
-       
-    }
-    .message-nav a{
-        display:inline-block;
-        color:black;
-        font-weight: bolder;
-        text-decoration: none;
-        float: left;
-        z-index: 1000;
-    }
-    .chat-box h1{
-    
-        text-align: center;
-    
-    }
-     .chat-box h2{
-        display: inline-block;
-        {% comment %} background-color:rgb(150, 150, 218); {% endcomment %}
-        
-        {% comment %} zindx:1; {% endcomment %}
-    }
-
-    .message {
-        width: fit-content;
-        margin-bottom: 12px;
-        display: flex;
-        
-        flex-direction: column;
-       max-width: 60%;
-       overflow-wrap: break-word;
-
-    }
-
-    .sent {
-       
-        {% comment %} align-self: flex-end; {% endcomment %}
-        justify-self: flex-end;
-        background-color: #dcf8c6;
-        border-radius: 12px 12px 0 12px;
-        padding: 10px;
-    }
-
-    .received {
-        {% comment %} align-self: flex-start; {% endcomment %}
-        justify-self: flex-start;
-        background-color: #eee;
-        border-radius: 12px 12px 12px 0;
-        padding: 10px;
-    }
-
-    .timestamp {
-        font-size: 12px;
-        color: #777;
-        text-align: right;
-    }
-    .message-form{
-        position:sticky;
-        bottom: 10px;
-        padding:15px;
-         background-color: #fdfdfd;
-    }
-    .chat-form {
-        display: flex;
-       
-       
-
-
-        gap: 10px;
-        {% comment %} margin-top: 20px; {% endcomment %}
-    }
-
-    .chat-form input[type="text"] {
-        flex: 1;
-        padding: 10px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-    }
-
-    .chat-form input[type="submit"] {
-        padding: 10px 20px;
-        border-radius: 6px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        cursor: pointer;
-    }
-</style>
-{% endblock css %}
-
+{% block title %}<title>Messages — Mini-oLx</title>{% endblock %}
 
 {% block content %}
-{% comment %} <h2>Chat about {{ conversation.product.title }}</h2>
-<div class="chat-box">
-    {% for message in messages %}
-        <p><strong>{{ message.sender.username }}</strong>: {{ message.message }} <em>{{ message.timestamp }}</em></p>
-    {% endfor %}
-</div>
+<div class="molx-container" style="padding-top: 1.5rem; padding-bottom: 1.5rem;">
+    <h1 style="margin: 0 0 1rem;">Messages</h1>
 
-<form method="post">
-    {% csrf_token %}
-    <input type="text" name="text" placeholder="Type your message..." required>
-    <button type="submit">Send</button>
-</form> {% endcomment %}
+    {% if chatroom %}
+        <div class="molx-chat molx-card">
+                <aside class="molx-chat__sidebar">
+                    <div class="molx-chat__sidebar-header">Conversations</div>
+                    {% for c in chatroom %}
+                    <a href="{% url 'chat_detail' c.id %}" class="molx-chat__item {% if c.id == conversation.id %}is-active{% endif %}" style="color:inherit;">
+                        <div class="molx-chat__item-avatar">{{ c.other_user.username|slice:":1"|upper }}</div>
+                        <div class="molx-chat__item-meta">
+                            <div class="molx-chat__item-title">{{ c.other_user.username }} · {{ c.product.title }}</div>
+                            <div class="molx-chat__item-sub">
+                                {% if c.last_message %}{{ c.last_message.message }}{% else %}No messages yet{% endif %}
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </aside>
 
-<div class="chat-box">
-     
-    <div class=message-nav>
-   <a href="{% url "chat_list" %}">⬅Back</a>
-    <h1>Chat about {{ conversation.product.title }}</h1>
-    <h2>Chat with {% if conversation.seller == request.user %}{{conversation.buyer.first_name}}{% else %}{{ conversation.seller.username }}{% endif %} </h2>
-    </div>
-<div id="message-box">
-    {% for msg in messages %}
-        <div class="message {% if msg.sender == request.user %}sent{% else %}received{% endif %}">
-            <p>{{ msg.message }}</p>
-            <div class="timestamp">{{ msg.timestamp|date:"d M Y, h:i A" }}</div>
+                <section class="molx-chat__main">
+                    <header class="molx-chat__header">
+                        <div class="molx-chat__item-avatar">{{ conversation.other_user.username|slice:":1"|upper }}</div>
+                        <div>
+                            <div class="molx-chat__header-title">{{ conversation.product.title }}</div>
+                            <div class="molx-chat__header-sub">
+                                With {{ conversation.other_user.first_name|default:conversation.other_user.username }}
+                            </div>
+                        </div>
+                    </header>
+
+                <div id="message-box" class="molx-chat__body">
+                    {% for msg in messages %}
+                        <div class="molx-msg {% if msg.sender == request.user %}molx-msg--me{% endif %}">
+                            <div class="molx-msg__avatar">{{ msg.sender.username|slice:":1"|upper }}</div>
+                            <div class="molx-msg__bubble">
+                                {{ msg.message }}
+                                <span class="molx-msg__time">{{ msg.created_at|date:"h:i A · M d" }}</span>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div style="text-align:center; color:var(--c-text-muted); padding: 2rem;">Say hi 👋</div>
+                    {% endfor %}
+                </div>
+
+                <div id="typing-indicator" class="molx-typing"></div>
+
+                <form id="chat-form" class="molx-chat__compose">
+                    {% csrf_token %}
+                    <input id="chat-input" type="text" placeholder="Type a message…" autocomplete="off" required>
+                    <button type="submit" class="molx-btn molx-btn--primary">Send</button>
+                </form>
+            </section>
         </div>
-    {% empty %}
-        <p>No messages yet.</p>
-    {% endfor %}
-    </div>
-<div class="message-form">
-    <form class="chat-form" id="chat-form"method="post">
-        {% csrf_token %}
-        <input type="text" name="text" id="chat-input" placeholder="Type your message..." required>
-        <input type="submit" value="Send">
-    </form>
-
-</div>
+    {% else %}
+        <div class="molx-card" style="padding: 3rem; text-align: center;">
+            <div style="font-size: 3rem;">💬</div>
+            <h2>No conversations yet</h2>
+            <p style="color:var(--c-text-muted);">Open any product and click <em>Chat with seller</em> to start a conversation.</p>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}
+
 {% block script %}
+{% if chatroom %}
 <script>
-function scrollToBottom() {
-    const chatBox = document.getElementById("message-box");
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    scrollToBottom();  // Auto scroll when page loads
-
-    const form = document.getElementById("chat-form");
-    const inputm = document.getElementById("chat-input");
-    {% comment %} const chatBox = document.getElementById("chat-box"); {% endcomment %}
+(function () {
+    const WS_SCHEME = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const socket = new WebSocket(
+        `${WS_SCHEME}://${window.location.host}/ws/chat/{{ conversation.id }}/`
+    );
+    const meId = {{ request.user.id }};
+    const meName = "{{ request.user.username|escapejs }}";
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-    form.addEventListener("submit", async function(e) {
-        e.preventDefault();
+    const body = document.getElementById('message-box');
+    const form = document.getElementById('chat-form');
+    const input = document.getElementById('chat-input');
+    const typingEl = document.getElementById('typing-indicator');
 
-        const messageText = inputm.value.trim();
-        if (!messageText) return;
+    let typingTimeout = null;
 
+    function appendMessage(m) {
+        const wrap = document.createElement('div');
+        wrap.className = 'molx-msg' + (m.sender_id === meId ? ' molx-msg--me' : '');
+        wrap.innerHTML = `
+            <div class="molx-msg__avatar">${(m.sender || '?')[0].toUpperCase()}</div>
+            <div class="molx-msg__bubble">
+                ${escapeHtml(m.message)}
+                <span class="molx-msg__time">${formatTime(m.created_at)}</span>
+            </div>`;
+        body.appendChild(wrap);
+        body.scrollTop = body.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+        return s.replace(/[&<>"']/g, c => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[c]);
+    }
+
+    function formatTime(iso) {
         try {
-            console.log("this is try runn")
-            const response = await fetch("{% url "chat_detail" conversation.id %}", {
-                method: "POST",
-                headers:{
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    "X-CSRFToken": csrfToken,
-                },
-                 {% comment %} body:`text=${encodeURIComponent(messageText)}` {% endcomment %}
-                 body: new URLSearchParams({
-                    text: messageText,
-                }), 
-            });
+            const d = new Date(iso);
+            return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } catch (e) { return ''; }
+    }
 
-            if (response.ok) {
-                const html = await response.text();
-                document.open();
-                document.write(html);
-                document.close();
-            } else {
-                console.error("Message send failed.");
-            }
-        } catch (error) {
-            console.error("AJAX Error:", error);
+    socket.addEventListener('open', () => console.log('ws connected'));
+
+    socket.addEventListener('message', (ev) => {
+        const data = JSON.parse(ev.data);
+        if (data.type === 'chat_message') {
+            appendMessage(data);
+            typingEl.textContent = '';
+        } else if (data.type === 'typing') {
+            typingEl.textContent = data.is_typing ? `${data.username} is typing…` : '';
+        } else if (data.type === 'presence') {
+            console.log('presence:', data);
         }
     });
-});
+
+    socket.addEventListener('close', () => {
+        console.warn('ws disconnected');
+    });
+
+    input.addEventListener('input', () => {
+        if (!typingTimeout) {
+            socket.send(JSON.stringify({ type: 'typing', is_typing: true }));
+        }
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+            socket.send(JSON.stringify({ type: 'typing', is_typing: false }));
+            typingTimeout = null;
+        }, 1200);
+    });
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = input.value.trim();
+        if (!text) return;
+        if (socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify({ type: 'chat_message', message: text }));
+        } else {
+            // WebSocket not ready — fall back to legacy POST so message
+            // is never lost. Consumer will pick up next time it reloads.
+            fetch("{% url 'chat_detail' conversation.id %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: new URLSearchParams({ text }),
+            });
+        }
+        input.value = '';
+        typingEl.textContent = '';
+    });
+
+    // Initial scroll to bottom on load.
+    body.scrollTop = body.scrollHeight;
+})();
 </script>
-{% endblock script %}
+{% endif %}
+{% endblock %}

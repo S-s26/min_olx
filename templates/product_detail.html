@@ -1,25 +1,53 @@
 {% extends "base.html" %}
-{% block title %}<title>Product Details</title>{% endblock %}
+{% block title %}<title>{{ product.title }} — Mini-oLx</title>{% endblock %}
 
 {% block content %}
-<!-- product_detail.html -->
-<div style="max-width: 800px; margin: auto; padding: 20px;">
-    <h2>{{ product.title }}</h2>
-    
-    <div class="image-row" style="display: flex; gap: 10px; overflow-x: auto; margin-top: 10px;">
-        {% for img in product.images.all %}
-        <img src="{{ img.image.url }}" alt="Image" style="width: 200px; height: 150px; object-fit: cover; border-radius: 8px;">
-        {% endfor %}
-    </div>
+<section class="molx-section">
+    <div class="molx-container molx-product-detail">
+        <div>
+            {% if product.images.all %}
+                <img src="{{ product.images.first.image.url }}" alt="{{ product.title }}"
+                     style="width:100%; aspect-ratio: 4/3; object-fit:cover; border-radius: var(--r-lg); margin-bottom:1rem;">
+                {% if product.images.count > 1 %}
+                <div class="molx-gallery">
+                    {% for img in product.images.all|slice:"1:" %}
+                        <img src="{{ img.image.url }}" alt="">
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% else %}
+                <div style="aspect-ratio: 4/3; background: var(--c-surface-2); display:grid; place-items:center; border-radius: var(--r-lg); font-size:4rem;">📦</div>
+            {% endif %}
+        </div>
 
-    <div style="margin-top: 20px;">
-        <p><strong>Price:</strong> ₹{{ product.price }}</p>
-        <p><strong>Description:</strong> {{ product.description }}</p>
-        <p><strong>Seller:</strong> {{ product.seller.first_name }}</p>
-        <p><strong>Uploaded:</strong> {{ product.created_at|date:"M d, Y H:i" }}</p>
-        <a href="/" style="margin-top: 10px; display: inline-block; background-color: #28a745; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none;">Back to Home</a>
-        <a href="{% url "start_chat" product.id %}" style="margin-top: 10px; display: inline-block; background-color: #28a745; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none;">sStart Chat{{product.id}}</a>
-    </div>
-</div>
-{% endblock content %}
+        <div>
+            <span class="molx-card__chip" style="position:static; display:inline-block; margin-bottom: .85rem;">
+                {{ product.get_category_display }}{% if product.brand %} · {{ product.brand }}{% endif %}
+            </span>
+            <h1 style="margin: 0 0 .5rem;">{{ product.title }}</h1>
+            <div class="molx-detail__price">₹{{ product.price }}</div>
+            <div class="molx-detail__meta">
+                📍 {{ product.address }} &nbsp;•&nbsp; Posted {{ product.created_at|timesince }} ago
+            </div>
 
+            <h3 style="margin-top: 1.5rem;">Description</h3>
+            <p style="color: var(--c-text-muted);">{{ product.description|linebreaks }}</p>
+
+            <h3 style="margin-top: 1.5rem;">Seller</h3>
+            <p style="color: var(--c-text-muted);">
+                {{ product.seller.first_name }} {{ product.seller.last_name }}
+                {% if product.phone_number %} · 📞 {{ product.phone_number }}{% endif %}
+            </p>
+
+            <div class="molx-flex" style="margin-top: 2rem; gap: .75rem;">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'start_chat' product.id %}" class="molx-btn molx-btn--primary">💬 Chat with seller</a>
+                {% else %}
+                    <a href="{% url 'login' %}?next={{ request.path }}" class="molx-btn molx-btn--primary">Sign in to chat</a>
+                {% endif %}
+                <a href="{% url 'home' %}" class="molx-btn molx-btn--ghost">← Back</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

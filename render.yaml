@@ -1,0 +1,71 @@
+# Render Blueprint — Mini-oLx
+#
+# What this provisions:
+#   • One Web Service running Daphne (ASGI: HTTP + WebSockets).
+#   • Optional Key-Value (Redis) service for the Channels layer.
+#   • Environment defaults for production secrets.
+#
+# How to apply:
+#   1. Push this repo to GitHub.
+#   2. In Render, "New → Blueprint" and point at this file.
+#   3. Fill the secret values Render prompts for (SECRET_KEY, etc.).
+#
+# Cost:  Free tier covers the web service + Redis. For 1000+ concurrent
+# users you'll want the Standard plan. See product.md § Scaling.
+
+services:
+  - type: web
+    name: mini-olx
+    runtime: python
+    plan: free        # bump to "starter" or "standard" for real traffic
+    buildCommand: |
+      pip install --upgrade pip &&
+      pip install -r requirements.txt &&
+      python manage.py collectstatic --noinput
+    startCommand: "./start.sh"
+    healthCheckPath: /
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: mini_olx.settings
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: WEB_CONCURRENCY
+        value: "3"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com,localhost,127.0.0.1"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mini-olx-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService: { name: mini-olx-redis, type: redis, property: connectionString }
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+      - key: DEFAULT_FROM_EMAIL
+        sync: false
+      - key: CLOUD_NAME
+        sync: false
+      - key: CLOUD_API_KEY
+        sync: false
+      - key: CLOUD_API_SECRET
+        sync: false
+    autoDeploy: true
+
+databases:
+  - name: mini-olx-db
+    plan: free         # swap for "starter" once you outgrow the 1 GB row cap
+    databaseName: mini_olx
+    user: mini_olx
+    ipAllowList: []
+
+  - name: mini-olx-redis
+    type: redis
+    plan: free         # 25 MB — plenty for 1k-user chat traffic
+    ipAllowList: []
+    region: oregon

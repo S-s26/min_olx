@@ -1,0 +1,14 @@
+{% comment %}
+Reusable partial that renders a list of messages. Used by the JSON
+history endpoint (chat_history view) so the wire format and DOM
+format stay in sync.
+{% endcomment %}
+{% for m in messages %}
+    <div class="molx-msg {% if m.sender_id == me_id %}molx-msg--me{% endif %}">
+        <div class="molx-msg__avatar">{{ m.sender|slice:":1"|upper }}</div>
+        <div class="molx-msg__bubble">
+            {{ m.message }}
+            <span class="molx-msg__time">{{ m.created_at|slice:":16" }}</span>
+        </div>
+    </div>
+{% endfor %}

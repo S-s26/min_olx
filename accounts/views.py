@@ -27,6 +27,8 @@ from accounts.models import customUser
 import random
 from django.core.mail import send_mail
 
+from activity.models import UserActivity
+
 # def signup(request):
 #     if (request.method=='POST'):
 #         form= customUserForm(request.POST)
@@ -105,6 +107,11 @@ def signup(request):
                     del request.session['otp']
                     del request.session['form_data']
                     login(request, user)
+                    UserActivity.record(
+                        user, UserActivity.EVENT_SIGNUP,
+                        title='Welcome to Mini-oLx!',
+                        detail=f'Joined as {user.username}',
+                    )
                     return redirect('home')
             else:
                 return render(request, 'signup.html', {'form': form, 'otp_sent': True, 'otp_error': 'OTP does not match'})
@@ -167,6 +174,10 @@ def logins(request):
         if form.is_valid():
             User = form.get_user()
             login(request,User)
+            UserActivity.record(
+                User, UserActivity.EVENT_LOGIN,
+                title='Signed in',
+            )
             return redirect('home')
         else:
             print(form.errors)

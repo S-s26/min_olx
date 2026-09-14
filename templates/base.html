@@ -4,81 +4,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% block title %}{% endblock title %}  
-  
-   <link rel="stylesheet" href={% static "style.css" %}>
-   {% block css %}{% endblock css %}
+    <meta name="theme-color" content="#7c3aed">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+    {% block title %}<title>Mini-oLx — Buy & sell locally</title>{% endblock %}
+
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    {% block css %}{% endblock %}
 </head>
 <body>
-    <header>
-        <div id="nav-bar">
-            <div class="logo">
-                <img src="assets/logo2.png" alt="logo ">
-            </div>
-            <div class="search-box">
-                <input type="search" placeholder="search products" id="search">
-                <div class="search-icon"><span id="search-iconb">🔍</span>
-                    <!-- <i class="ri-search-line">🔍</i> -->
+
+<header class="molx-nav">
+    <div class="molx-nav__inner molx-container">
+        <a href="{% url 'home' %}" class="molx-brand">
+            <span class="molx-brand__logo">🛍️</span>
+            <span>Mini-oLx</span>
+        </a>
+
+        <form class="molx-search" action="{% url 'home' %}" method="get" role="search">
+            <input type="search" name="q" placeholder="Search phones, furniture, cars…" value="{{ request.GET.q }}">
+            <button type="submit" aria-label="Search">🔍</button>
+        </form>
+
+        <nav class="molx-nav__links">
+            {% if user.is_authenticated %}
+                <a href="{% url 'add_product' %}" class="molx-nav__link molx-nav__link--primary">＋ Sell</a>
+                <a href="{% url 'my_products' %}" class="molx-nav__link">My products</a>
+                <a href="{% url 'chat_list' %}" class="molx-nav__link">💬 Chats</a>
+                <a href="{% url 'my_activity' %}" class="molx-nav__link">📜 Activity</a>
+
+                <div class="molx-nav__user" tabindex="0" aria-label="Account menu">
+                    <span class="molx-nav__user-avatar">{{ user.first_name|slice:":1"|upper|default:user.username|slice:":1"|upper }}</span>
+                    <span style="font-size:.92rem;">{{ user.first_name|default:user.username }}</span>
+                    <div class="molx-nav__menu" role="menu">
+                        <a href="{% url 'my_products' %}">My listings</a>
+                        <a href="{% url 'add_product' %}">Post a product</a>
+                        <a href="{% url 'chat_list' %}">Messages</a>
+                        <a href="{% url 'my_activity' %}">Activity log</a>
+                        <a href="{% url 'logout' %}">Logout</a>
+                    </div>
                 </div>
+            {% else %}
+                <a href="{% url 'login' %}" class="molx-nav__link">Login</a>
+                <a href="{% url 'signup' %}" class="molx-nav__link molx-nav__link--primary">Sign up</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+
+<main>
+    {% if messages %}
+        <div class="molx-container" style="padding-top: 1rem;">
+            {% for m in messages %}
+                <div class="molx-toast {% if m.tags %}molx-toast--{{ m.tags }}{% endif %} is-visible">{{ m }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="molx-footer">
+    <div class="molx-container">
+        <div class="molx-footer__grid">
+            <div>
+                <h4>Mini-oLx</h4>
+                <p>Buy and sell locally. Every item gets a second chance. Smart, fast, fair.</p>
             </div>
-            <div id="login-out">
-                {% if user.is_authenticated %}
-                <a href="{% url 'add_product' %}">Post Your Product</a>
-                <a href="{% url 'my_products' %}">my Product</a>
-                <a href="{% url 'chat_list' %}">CHAT</a>
-
-
-                <a href="{% url 'logout' %}">{{user.first_name}}</a>
-                {% else %}
-                <a href="{% url 'login' %}">Login</a>
-                {% endif %}
-                           </div>
+            <div>
+                <h4>Marketplace</h4>
+                <p><a href="{% url 'home' %}">Browse all</a></p>
+                <p><a href="{% url 'add_product' %}">Sell an item</a></p>
+                <p><a href="{% url 'chat_list' %}">Messages</a></p>
+            </div>
+            <div>
+                <h4>Company</h4>
+                <p><a href="#">About us</a></p>
+                <p><a href="#">Careers</a></p>
+                <p><a href="#">Contact</a></p>
+            </div>
+            <div>
+                <h4>Legal</h4>
+                <p><a href="#">Terms</a></p>
+                <p><a href="#">Privacy</a></p>
+                <p><a href="#">Cookies</a></p>
+            </div>
         </div>
-   </header>
+        <div class="molx-footer__bottom">© {% now "Y" %} Mini-oLx. Built with Django ⚡ Channels. All rights reserved.</div>
+    </div>
+</footer>
 
-    <main>
-        {% block content %}{% endblock content %}
-        
-    </main>
-    
-   <footer>
-    <div class="footer-container">
-        <!-- Section 1: Info -->
-        <div class="footer-section">
-          <h3>Mini oLx</h3>
-          <p>Connecting buyers and sellers near you .<br> Every item has a second Chance <br>Find what you need . sell what you don't. <br> Buy smart. sell fast. Live easy. <br>Your local marketplace in your pocket <br> </p>
-          <ul class="footer-links">
-            <li><a href="/about">About Us</a></li>
-            <li><a href="/privacy-policy">Privacy Policy</a></li>
-            <li><a href="/terms">Terms & Conditions</a></li>
-          </ul>
-        </div>
-    
-        <!-- Section 2: Contact Form -->
-        <div class="footer-section">
-          <h4>Contact Us</h4>
-          <form class="contact-form" action="/submit-contact" method="POST">
-            <input type="text" name="name" placeholder="Your Name" required />
-            <input type="email" name="email" placeholder="Your Email" required />
-            <input type="tel" name="phone" placeholder="Your Phone Number" required />
-            <button type="submit">Submit</button>
-          </form>
-        </div>
-      </div>
-    
-      <p class="footer-disclaimer">
-        <!-- Disclaimer: CompareKart is a third-party platform that fetches data from trusted e-commerce websites via APIs. Prices and availability may vary and are subject to change without notice. -->
-      </p>
-    
-      <div class="footer-socials">
-        <a href="#"><i class="ri-facebook-box-fill"></i></a>
-        <a href="#"><i class="ri-twitter-x-line"></i></a>
-        <a href="#"><i class="ri-instagram-fill"></i></a>
-      </div>
-    
-      <p class="footer-bottom">&copy; 2025 Mini oLx. All rights reserved.</p>
-   </footer>
-    {% block script %}{% endblock script %}
+<script src="{% static 'js/app.js' %}" defer></script>
+{% block script %}{% endblock %}
 </body>
 </html>
