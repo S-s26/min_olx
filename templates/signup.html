@@ -1,67 +1,84 @@
 {% extends "base.html" %}
+{% block title %}<title>Create account — Mini-oLx</title>{% endblock %}
 
-{% block title %}<title>Register</title>{% endblock title %}
+{% block content %}
+<section class="molx-auth">
+    <div class="molx-auth__card" style="max-width: 560px;">
+        <h1>{% if otp_sent %}Verify your email{% else %}Create your account{% endif %}</h1>
+        <p class="lede">
+            {% if otp_sent %}
+                We just sent a 6-digit code to <strong>{{ form.email.value }}</strong>. Enter it below to finish.
+            {% else %}
+                Join Mini-oLx in 30 seconds. Free forever.
+            {% endif %}
+        </p>
 
-{% comment %} {% block css %}<link rel="stylesheet" href={% static "style.css" %}>{% endblock css %} {% endcomment %}
-{% block content %} 
-<section id="signup">
-    <fieldset style="padding: 50px 20vw;">
-    <h1>Sign up</h1>
-    <form action="" method="post">
-        {% csrf_token %}
-        <div id="username-box">
-        <label for="username">User Name </label>
-        <input type="text" name="username" id="username" value="{{form.username.value}}">
-        <span class="text-denger">{{form.username.errors}}</span>
+        <form method="post" novalidate>
+            {% csrf_token %}
 
-         </div>
-        <label for="firstname">First Name </label>
-        <input type="text" name="first_name" id="firstname" value="{{form.first_name.value}}">
-        <span class="text-denger">{{form.first_name.errors}}</span>
-        <label for="lastname">Last Name </label>
-        <input type="text" name="last_name" id="lastname" value="{{form.last_name.value}}">
-        <span class="text-denger">{{form.last_name.errors}}</span>
-        <label for="email">Email Id </label>
-        <input type="email" id="email" name="email" value="{{form.email.value}}">
-        <span class="text-denger">{{form.email.errors}}</span>
-        <label for="phone">Phone</label>
-        <input type="tel" id="phone" name="phone" value="{{form.phone.value}}">
-        <span class="text-denger">{{form.phone.errors}}</span>
-        <label for="address">Address</label>
-        <input type="text" name="address"  id="address" value="{{form.address.value}}">
-         {% if  not otp_sent %}
-        <label for="password1">Password</label>
-        <input type="password" name="password1" id="password1">
-        <span class="text-denger">{{form.password1.errors}}</span> 
-        {% if form.password1.errors %}
-        {% for error in form.password1.errors  %}
-            <span class="text-denger">{{error}}</span> 
-        {% endfor %}
-        {% endif %}
-       
-        <label for="password2">Re-Password</label>
-        <input type="password" name="password2" id="password2">
-        <span class="text-denger">{{form.password2.errors}}</span>
-        {% endif %}
+            {% if not otp_sent %}
+                <div class="molx-field">
+                    <label for="id_username">Username</label>
+                    <input class="molx-input" id="id_username" type="text" name="username" value="{{ form.username.value|default:'' }}" required>
+                    {% for e in form.username.errors %}<div class="molx-error">{{ e }}</div>{% endfor %}
+                </div>
 
-        {% if otp_sent %}
-        <label for="otp">Enter OTP:</label>
-        <input type="text" name="otp" required>
-        {% if otp_error %}
-<p style="color: red;">{{ otp_error }}</p>
-{% endif %}
-        
-    
-       
-        {% endif %}
-        <div class="submit">
-        <input type="submit" value="Submit">
-        <a href="{% url "login" %}">Login </a>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="molx-field">
+                        <label for="id_first_name">First name</label>
+                        <input class="molx-input" id="id_first_name" type="text" name="first_name" value="{{ form.first_name.value|default:'' }}">
+                    </div>
+                    <div class="molx-field">
+                        <label for="id_last_name">Last name</label>
+                        <input class="molx-input" id="id_last_name" type="text" name="last_name" value="{{ form.last_name.value|default:'' }}">
+                    </div>
+                </div>
+
+                <div class="molx-field">
+                    <label for="id_email">Email</label>
+                    <input class="molx-input" id="id_email" type="email" name="email" value="{{ form.email.value|default:'' }}" required>
+                    {% for e in form.email.errors %}<div class="molx-error">{{ e }}</div>{% endfor %}
+                </div>
+
+                <div class="molx-field">
+                    <label for="id_phone">Phone</label>
+                    <input class="molx-input" id="id_phone" type="tel" name="phone" value="{{ form.phone.value|default:'' }}" required>
+                    {% for e in form.phone.errors %}<div class="molx-error">{{ e }}</div>{% endfor %}
+                </div>
+
+                <div class="molx-field">
+                    <label for="id_address">Address</label>
+                    <input class="molx-input" id="id_address" type="text" name="address" value="{{ form.address.value|default:'' }}">
+                </div>
+
+                <div class="molx-field">
+                    <label for="id_password1">Password</label>
+                    <input class="molx-input" id="id_password1" type="password" name="password1" required>
+                    {% for e in form.password1.errors %}<div class="molx-error">{{ e }}</div>{% endfor %}
+                </div>
+
+                <div class="molx-field">
+                    <label for="id_password2">Confirm password</label>
+                    <input class="molx-input" id="id_password2" type="password" name="password2" required>
+                    {% for e in form.password2.errors %}<div class="molx-error">{{ e }}</div>{% endfor %}
+                </div>
+
+                <button type="submit" class="molx-btn molx-btn--primary molx-btn--block">Send OTP</button>
+
+            {% else %}
+                <div class="molx-field">
+                    <label for="id_otp">6-digit code</label>
+                    <input class="molx-input" id="id_otp" type="text" name="otp" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autofocus required>
+                    {% if otp_error %}<div class="molx-error">{{ otp_error }}</div>{% endif %}
+                </div>
+
+                <button type="submit" class="molx-btn molx-btn--primary molx-btn--block">Verify &amp; create account</button>
+            {% endif %}
+
+            <p style="text-align:center; margin-top:1.25rem; color: var(--c-text-muted);">
+                Already a member? <a href="{% url 'login' %}" style="color:var(--c-primary); font-weight:600;">Sign in</a>
+            </p>
+        </form>
     </div>
-
-
-    </form>
-</fieldset>
-
 </section>
-{% endblock content %}
+{% endblock %}

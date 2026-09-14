@@ -1,17 +1,74 @@
 {% extends "base.html" %}
-{% block title %}<title>Add Product</title>{% endblock %}
+{% block title %}<title>Post a product — Mini-oLx</title>{% endblock %}
 
 {% block content %}
-<h1>Add Product</h1>
+<section class="molx-section">
+    <div class="molx-container" style="max-width: 760px;">
+        <div class="molx-card" style="padding: 2.25rem;">
+            <h1 style="margin-top:0;">Post a product</h1>
+            <p style="color: var(--c-text-muted);">Add details, upload up to 5 photos, and reach thousands of local buyers.</p>
 
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    {{ formset.management_form }}
-    {% for img_form in formset %}
-        {{ img_form.image.label_tag }} {{ img_form.image }}
-    {% endfor %}
-    <button type="submit">Add Product</button>
-</form>
+            <form method="POST" enctype="multipart/form-data" class="molx-stack" style="margin-top: 1.5rem;">
+                {% csrf_token %}
 
+                <div class="molx-field">
+                    <label>Title</label>
+                    {{ form.title }}
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="molx-field">
+                        <label>Price (₹)</label>
+                        {{ form.price }}
+                    </div>
+                    <div class="molx-field">
+                        <label>Phone</label>
+                        {{ form.phone_number }}
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="molx-field">
+                        <label>Category</label>
+                        {{ form.category }}
+                    </div>
+                    <div class="molx-field">
+                        <label>Subcategory</label>
+                        {{ form.subcategory }}
+                    </div>
+                </div>
+
+                <div class="molx-field">
+                    <label>Brand (optional)</label>
+                    <input class="molx-input" type="text" name="brand" placeholder="e.g. Apple, IKEA">
+                </div>
+
+                <div class="molx-field">
+                    <label>Address</label>
+                    {{ form.address }}
+                </div>
+
+                <div class="molx-field">
+                    <label>Description</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="molx-field">
+                    <label>Photos (up to 5)</label>
+                    {{ formset.management_form }}
+                    <div class="molx-grid" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));">
+                        {% for img_form in formset %}
+                            <label class="molx-card" style="padding: 1rem; cursor: pointer; align-items: center; text-align:center;">
+                                <div style="font-size: 2rem;">📷</div>
+                                {{ img_form.image }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <button type="submit" class="molx-btn molx-btn--primary molx-btn--block" style="margin-top: 1rem;">Publish listing</button>
+            </form>
+        </div>
+    </div>
+</section>
 {% endblock %}

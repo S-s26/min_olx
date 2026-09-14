@@ -24,30 +24,34 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=lambda v: [s.strip() for s in v.split(',')])
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS',
+    default='localhost,127.0.0.1',
+    cast=lambda v: [s.strip() for s in v.split(',')]
+)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 
-
-
-
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',  # must come before django.contrib.staticfiles
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'channels',
     'cloudinary_storage',
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'cloudinary',
     'accounts',
     'product',
-    'chat'
+    'chat',
+    'activity',
 ]
 
 MIDDLEWARE = [
@@ -66,7 +70,7 @@ ROOT_URLCONF = 'mini_olx.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR,'templates'],
+        'DIRS': [BASE_DIR, 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -79,23 +83,19 @@ TEMPLATES = [
     },
 ]
 
+# Use daphne in production for HTTP + WebSocket support.
 WSGI_APPLICATION = 'mini_olx.wsgi.application'
+ASGI_APPLICATION = 'mini_olx.asgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-DATABASES={
-    'default': dj_database_url.config('DATABASE_URL', default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+DATABASES = {
+    'default': dj_database_url.config(
+        'DATABASE_URL',
+        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
         conn_max_age=600,
-        
     )
 }
 
@@ -103,18 +103,10 @@ DATABASES={
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 
@@ -122,11 +114,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 
@@ -134,29 +123,24 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS=[
-    BASE_DIR / "static",
-]
-STATIC_ROOT =os.path.join (BASE_DIR ,'staticfiles')
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+AUTH_USER_MODEL = 'accounts.customUser'
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'https://min-olx-1.onrender.com',
+    'https://*.onrender.com',
+]
 
 
-AUTH_USER_MODEL ='accounts.customUser'
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000','https://min-olx-1.onrender.com','https://*.onrender.com']
-#this is for email backend configuration in terminal
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# DEFAULT_FROM_EMAIL = 
-
-
-
-# Email backend configuration for production (uncomment when needed)
+# ----- Email backend -----
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -166,28 +150,91 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
 
-
-
-
-
+# ----- Cloudinary media storage -----
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME':config('CLOUD_NAME'),
-    'API_KEY':config('CLOUD_API_KEY'),
-    'API_SECRET':config('CLOUD_API_SECRET'),
+    'CLOUD_NAME': config('CLOUD_NAME'),
+    'API_KEY': config('CLOUD_API_KEY'),
+    'API_SECRET': config('CLOUD_API_SECRET'),
 }
 WHITENOISE_MAINIFEST_STRICT = False
-WHIEBOISE_USE_FINDERS = True
+WHITENOISE_USE_FINDERS = True
 
 STORAGES = {
     'default': {
         'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage',
     },
     'staticfiles': {
-        'BACKEND': 'whitenoise.storage.StaticFilesStorage',
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
     },
 }
-STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 MEDIA_URL = '/media/'
-# MEDIA_ROOT = BASE_DIR / 'media'
 
+
+# =====================================================================
+# Scalability & performance configuration
+# Target: comfortably handle ~1,000 concurrent users and burst traffic.
+# =====================================================================
+
+# --- Channels: real-time chat WebSocket layer --------------------------
+# In dev (no REDIS_URL) we fall back to an in-process layer so the app
+# still boots without external services. In production, point REDIS_URL
+# at an Upstash/managed Redis instance for cross-worker pub/sub.
+REDIS_URL = config('REDIS_URL', default='')
+
+if REDIS_URL:
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {'hosts': [REDIS_URL]},
+        },
+    }
+else:
+    CHANNEL_LAYERS = {
+        'default': {'BACKEND': 'channels.layers.InMemoryChannelLayer'},
+    }
+
+# --- Cache: product list / home feed -----------------------------------
+# Reused as both Django cache backend and for throttling/ratelimiting.
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache' if REDIS_URL
+                   else 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': REDIS_URL or 'mini-olx-local',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        } if REDIS_URL else {},
+        'KEY_PREFIX': 'molx',
+        'TIMEOUT': 300,
+    }
+}
+
+# --- Sessions in cache (avoids DB roundtrip on every request) ----------
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+SESSION_CACHE_ALIAS = 'default'
+
+# --- Production-only security toggles ---------------------------------
+# These are safe defaults for any HTTPS-terminated host (Render provides
+# SSL at the proxy). They have no effect on a plain-HTTP dev server
+# because DEBUG short-circuits the HSTS / SSL redirect machinery.
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30  # 30 days
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_REFERRER_POLICY = 'same-origin'
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+
+# Default page sizes for large lists (kept small by default; oversize
+# via ?page= override on listings).
+DEFAULT_PAGE_SIZE = 24
+
+# Default page sizes for large lists (kept small by default; oversize
+# via ?page= override on listings).
+DEFAULT_PAGE_SIZE = 24

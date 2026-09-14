@@ -1,28 +1,36 @@
 {% extends "base.html" %}
-{% block title %}<title>Login</title>{% endblock title %}
+{% block title %}<title>Sign in — Mini-oLx</title>{% endblock %}
+
 {% block content %}
-<section id="signup">
-<fieldset style="padding: 50px 20vw;">
-    <h1>Login</h1>
-    <form action="" method="post">
-        {% csrf_token %}
-        <span class="text-danger">{{form.non_field_errors}}</span>
-        <label for="username">User Name </label>
-        <input type="text" name="username" id="username" value="{{form.username.value}}">
-        <span class="text-danger">{{form.username.errors}}</span>
-        
-        <label for="password1">Password</label>
-        <input type="password" name="password" id="password1" >
-        <span class="text-danger">{{form.password.errors}}</span>
-        <div class="submit">
-        <input type="submit" value="Submit">
-        <a href="{% url "signup" %}">Sign Up </a>
+<section class="molx-auth">
+    <div class="molx-auth__card">
+        <h1>Welcome back 👋</h1>
+        <p class="lede">Sign in to post products and chat with sellers.</p>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="molx-error">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="molx-field">
+                <label for="id_username">Username</label>
+                <input class="molx-input" id="id_username" type="text" name="username" value="{{ form.username.value|default:'' }}" autofocus required>
+                {% for e in form.username.errors %}<div class="molx-error">{{ e }}</div>{% endfor %}
+            </div>
+
+            <div class="molx-field">
+                <label for="id_password">Password</label>
+                <input class="molx-input" id="id_password" type="password" name="password" required>
+                {% for e in form.password.errors %}<div class="molx-error">{{ e }}</div>{% endfor %}
+            </div>
+
+            <button type="submit" class="molx-btn molx-btn--primary molx-btn--block">Sign in</button>
+
+            <p style="text-align:center; margin-top:1.25rem; color: var(--c-text-muted);">
+                New to Mini-oLx? <a href="{% url 'signup' %}" style="color:var(--c-primary); font-weight:600;">Create an account</a>
+            </p>
+        </form>
     </div>
-
-
-    </form>
-</fieldset>
-
 </section>
-
-{% endblock content %}
+{% endblock %}

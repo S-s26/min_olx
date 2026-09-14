@@ -1,17 +1,33 @@
 {% extends "base.html" %}
+{% block title %}<title>Messages — Mini-oLx</title>{% endblock %}
+
 {% block content %}
-<h2>Chat List </h2>
-<div class="chat-box">
-    {% for conversation in chatroom %}
-        <a href="{% url "chat_detail" conversation.id %}" style="text-decoration: none; color: inherit;">
-            <div class="chat-item" style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
-                <h3>{{ conversation.product.title }}</h3>
-                <p>Last message: {{ conversation.last_message.message }}</p>
-                <p>Seller: {{ conversation.product.seller.first_name }}</p>
-                <p>Chat started at: {{ conversation.created_at|date:"M d, Y H:i" }}</p>
+<section class="molx-section">
+    <div class="molx-container">
+        <h1 style="margin:0 0 1.25rem;">Messages</h1>
+
+        {% if chatroom %}
+            <div class="molx-card" style="overflow:hidden;">
+                {% for c in chatroom %}
+                <a href="{% url 'chat_detail' c.id %}" class="molx-chat__item" style="color:inherit;">
+                    <div class="molx-chat__item-avatar">{{ c.other_user.username|slice:":1"|upper }}</div>
+                    <div class="molx-chat__item-meta">
+                        <div class="molx-chat__item-title">{{ c.other_user.username }} · {{ c.product.title }}</div>
+                        <div class="molx-chat__item-sub">
+                            {% if c.last_message %}{{ c.last_message.message }}{% else %}No messages yet{% endif %}
+                        </div>
+                    </div>
+                    <span class="molx-card__meta">{{ c.updated_at|timesince }} ago</span>
+                </a>
+                {% endfor %}
             </div>
-    {% endfor %}
-</div>
-
-
+        {% else %}
+            <div class="molx-card" style="padding: 3rem; text-align:center;">
+                <div style="font-size: 3rem;">💬</div>
+                <h2>No conversations yet</h2>
+                <p style="color:var(--c-text-muted);">Open any product and click <em>Chat with seller</em> to start a conversation.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
 {% endblock %}
