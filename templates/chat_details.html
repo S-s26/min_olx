@@ -2,11 +2,11 @@
 {% block title %}<title>Messages — Mini-oLx</title>{% endblock %}
 
 {% block content %}
-<div class="molx-container" style="padding-top: 1.5rem; padding-bottom: 1.5rem;">
-    <h1 style="margin: 0 0 1rem;">Messages</h1>
+<div class="molx-container" style="padding-top: 1rem; padding-bottom: 1rem; height: calc(100vh - 70px); display: flex; flex-direction: column;">
+    <h1 style="margin: 0 0 1rem; font-size: 1.5rem;">Messages</h1>
 
     {% if chatroom %}
-        <div class="molx-chat molx-card">
+        <div class="molx-chat molx-card" style="flex: 1; height: 100%; min-height: 0; overflow: hidden;">
                 <aside class="molx-chat__sidebar">
                     <div class="molx-chat__sidebar-header">Conversations</div>
                     {% for c in chatroom %}
@@ -22,7 +22,7 @@
                     {% endfor %}
                 </aside>
 
-                <section class="molx-chat__main">
+                <section class="molx-chat__main" style="height: 100%; display: flex; flex-direction: column; overflow: hidden;">
                     <header class="molx-chat__header">
                         <div class="molx-chat__item-avatar">{{ conversation.other_user.username|slice:":1"|upper }}</div>
                         <div>
@@ -156,6 +156,8 @@
                     'X-CSRFToken': csrfToken,
                 },
                 body: new URLSearchParams({ text }),
+            }).then(() => {
+                window.location.reload();
             });
         }
         input.value = '';
