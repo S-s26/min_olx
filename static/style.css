@@ -54,6 +54,7 @@ body {
     display: flex;
     flex-direction: column;
     -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: none;
 }
 
 main { flex: 1; }
@@ -322,6 +323,7 @@ a { color: inherit; text-decoration: none; }
 
 .molx-chat__body {
     flex: 1; overflow-y: auto;
+    overscroll-behavior: contain;
     padding: 1.5rem;
     background:
         repeating-linear-gradient(45deg, rgba(124,58,237,.025) 0 8px, transparent 8px 16px),
