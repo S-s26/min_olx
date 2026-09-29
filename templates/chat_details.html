@@ -156,8 +156,23 @@
                     'X-CSRFToken': csrfToken,
                 },
                 body: new URLSearchParams({ text }),
-            }).then(() => {
-                window.location.reload();
+            }).then(res => {
+                if(!res.ok) {
+                    alert("Error sending message. Check console or CSRF.");
+                    throw new Error("HTTP error " + res.status);
+                }
+                return res.json();
+            }).then(data => {
+                if(data.status === 'ok') {
+                    appendMessage({
+                        sender_id: meId,
+                        sender: meName,
+                        message: text,
+                        created_at: new Date().toISOString()
+                    });
+                }
+            }).catch(err => {
+                console.error(err);
             });
         }
         input.value = '';
