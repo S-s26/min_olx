@@ -13,13 +13,8 @@ def chat_list(request):
     """List every conversation the current user participates in."""
     user = request.user
     qs = (
-        chatroom.objects
-        .filter(buyer=user) | chatroom.objects.filter(seller=user)
-    )
-    # [OLD CODE - Commented out because it caused "Cannot filter a query once a slice has been taken" error]
-    # qs = qs.select_related('product', 'buyer', 'seller').prefetch_related(
-    #     Prefetch('message', queryset=message.objects.order_by('-created_at')[:1])
-    # ).order_by('-updated_at')
+        chatroom.objects.filter(buyer=user) | chatroom.objects.filter(seller=user)
+    ).filter(message__isnull=False).distinct()
 
     # [NEW CODE - Removed Prefetch slice; the model's @property handles last_message]
     qs = qs.select_related('product', 'buyer', 'seller').order_by('-updated_at')
@@ -86,7 +81,7 @@ def chat_details(request, chatroom_id):
     qs = (
         chatroom.objects.filter(buyer=request.user) | 
         chatroom.objects.filter(seller=request.user)
-    )
+    ).filter(message__isnull=False).distinct()
     qs = qs.select_related('product', 'buyer', 'seller').order_by('-updated_at')
     rooms = []
     for room in qs:
