@@ -70,6 +70,15 @@ def chat_details(request, chatroom_id):
     if request.user.id not in (conversation.buyer_id, conversation.seller_id):
         return redirect('home')
 
+    if request.method == 'POST':
+        text = request.POST.get('text', '').strip()
+        if text:
+            msg = message.objects.create(room=conversation, sender=request.user, message=text)
+            conversation.save(update_fields=['updated_at'])
+            from django.http import JsonResponse
+            return JsonResponse({'status': 'ok', 'id': msg.id})
+        return JsonResponse({'status': 'error', 'message': 'Empty message'}, status=400)
+
     messages = conversation.message.order_by('created_at')
     conversation.other_user = (
         conversation.seller if conversation.buyer_id == request.user.id else conversation.buyer

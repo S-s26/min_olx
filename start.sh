@@ -13,5 +13,5 @@ if [ -z "$PORT" ]; then export PORT=10000; fi
 # -2 for the ASGI lifecycle overhead.
 WORKERS="${WEB_CONCURRENCY:-3}"
 
-echo "==> Starting daphne on 0.0.0.0:${PORT} with ${WORKERS} workers"
-exec daphne -b 0.0.0.0 -p "${PORT}" --workers "${WORKERS}" mini_olx.asgi:application
+echo "==> Starting daphne on 0.0.0.0:${PORT}"
+exec daphne -b 0.0.0.0 -p "${PORT}" mini_olx.asgi:application
