@@ -90,10 +90,49 @@ from activity.models import UserActivity
 
 
 
-# this is signup code with otp verification on email method 2  using same temlate
+from django.conf import settings
+from django.contrib import messages
+
+def _send_otp(request, email, otp, is_resend=False):
+    # Check if we should fallback to screen (Demo Mode)
+    # Get the appropriate API key depending on if it's a resend
+    api_key = getattr(settings, 'BACKUP_API_KEY', '') if is_resend else getattr(settings, 'BREVO_API_KEY', '')
+    
+    if settings.DEBUG or not api_key:
+        # Fallback to screen message
+        messages.info(request, f"DEMO MODE: Your OTP is {otp}")
+        print(f"Fallback OTP shown on screen: {otp}")
+        return False
+    else:
+        # Try to send email
+        try:
+            send_mail(
+                subject='Your OTP for Mini-oLx Signup',
+                message=f'Your OTP is: {otp}',
+                from_email='Mini-oLx <kyobatau6@gmail.com>',
+                recipient_list=[email],
+                fail_silently=False,
+            )
+            return True
+        except Exception as e:
+            print(f"bhai mail nahi ja raha hai error ye hai {e}")
+            messages.warning(request, f"Email delivery failed. DEMO MODE OTP: {otp}")
+            return False
+
 def signup(request):
     if request.method == 'POST':
-        if 'otp' in request.POST:
+        if 'resend_otp' in request.POST:
+            # Resend OTP logic
+            form_data = request.session.get('form_data')
+            if form_data:
+                otp = str(random.randint(100000, 999999))
+                request.session['otp'] = otp
+                _send_otp(request, form_data['email'], otp, is_resend=True)
+                form = customUserForm(form_data)
+                return render(request, 'signup.html', {'form': form, 'otp_sent': True})
+            return redirect('signup')
+
+        elif 'otp' in request.POST:
             # OTP verification phase
             form_data = request.session.get('form_data')
             form = customUserForm(form_data)
@@ -120,20 +159,9 @@ def signup(request):
             form = customUserForm(request.POST)
             if form.is_valid():
                 otp = str(random.randint(100000, 999999))
-                try:
-                    send_mail(
-                        subject='Your OTP for Mini-Olex Signup',
-                        message=f'Your OTP is: {otp}',
-                        from_email='Mini-Olex <kyobatau6@gmail.com>',
-                        recipient_list=[form.cleaned_data['email']],
-                        fail_silently=False,
-                    )
-                except Exception as e:
-                    print(f"bhai mail nahi ja raha hai error ye hai {e}")
-                    print(f"otp is {otp}")
                 request.session['otp'] = otp
-                print("OTP sent to email:", otp)
                 request.session['form_data'] = request.POST
+                _send_otp(request, form.cleaned_data['email'], otp, is_resend=False)
                 return render(request, 'signup.html', {'form': form, 'otp_sent': True})
     else:
          list_display={'username':'','first_name':'','last_name':'','email':'','phone':'','address':''}

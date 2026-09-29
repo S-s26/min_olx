@@ -16,6 +16,16 @@
         <form method="post" novalidate>
             {% csrf_token %}
 
+            {% if messages %}
+            <div style="margin-bottom: 1.5rem;">
+                {% for message in messages %}
+                <div style="padding: 1rem; border-radius: 4px; background: #e0f2fe; color: #0369a1; margin-bottom: 0.5rem; font-weight: bold; border: 1px solid #bae6fd;">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
             {% if not otp_sent %}
                 <div class="molx-field">
                     <label for="id_username">Username</label>
@@ -72,7 +82,34 @@
                     {% if otp_error %}<div class="molx-error">{{ otp_error }}</div>{% endif %}
                 </div>
 
-                <button type="submit" class="molx-btn molx-btn--primary molx-btn--block">Verify &amp; create account</button>
+                <button type="submit" class="molx-btn molx-btn--primary molx-btn--block" name="verify_otp">Verify &amp; create account</button>
+                
+                <div id="timer-display" style="text-align:center; margin-top: 1rem; color: var(--c-text-muted); font-size: 0.9rem;">
+                    Resend OTP in <strong id="countdown">120</strong> seconds.
+                </div>
+                
+                <button type="submit" name="resend_otp" id="resend-btn" class="molx-btn molx-btn--ghost molx-btn--block" style="display:none; margin-top: 1rem;">
+                    Resend OTP
+                </button>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        let timeLeft = 120;
+                        const timerEl = document.getElementById('countdown');
+                        const timerDiv = document.getElementById('timer-display');
+                        const resendBtn = document.getElementById('resend-btn');
+                        
+                        const interval = setInterval(() => {
+                            timeLeft--;
+                            if(timerEl) timerEl.textContent = timeLeft;
+                            if (timeLeft <= 0) {
+                                clearInterval(interval);
+                                if(timerDiv) timerDiv.style.display = 'none';
+                                if(resendBtn) resendBtn.style.display = 'block';
+                            }
+                        }, 1000);
+                    });
+                </script>
             {% endif %}
 
             <p style="text-align:center; margin-top:1.25rem; color: var(--c-text-muted);">

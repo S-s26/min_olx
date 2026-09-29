@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'product',
     'chat',
     'activity',
+    'anymail',
 ]
 
 MIDDLEWARE = [
@@ -141,12 +142,23 @@ CSRF_TRUSTED_ORIGINS = [
 
 
 # ----- Email backend -----
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+BREVO_API_KEY = config('BREVO_API_KEY', default='')
+BACKUP_API_KEY = config('BACKUP_API_KEY', default='')
+
+if BREVO_API_KEY:
+    EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
+    ANYMAIL = {
+        "BREVO_API_KEY": BREVO_API_KEY,
+    }
+else:
+    # Use console backend if API keys are missing (or just fallback to screen as handled in views)
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
 
