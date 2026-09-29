@@ -6,15 +6,11 @@
     <div class="molx-container molx-product-detail">
         <div>
             {% if product.images.all %}
-                <img src="{{ product.images.first.image.url }}" alt="{{ product.title }}"
-                     style="width:100%; aspect-ratio: 4/3; object-fit:cover; border-radius: var(--r-lg); margin-bottom:1rem;">
-                {% if product.images.count > 1 %}
-                <div class="molx-gallery">
-                    {% for img in product.images.all|slice:"1:" %}
-                        <img src="{{ img.image.url }}" alt="">
+                <div class="molx-product-carousel">
+                    {% for img in product.images.all %}
+                        <img src="{{ img.image.url }}" alt="{{ product.title }}" class="molx-product-slide">
                     {% endfor %}
                 </div>
-                {% endif %}
             {% else %}
                 <div style="aspect-ratio: 4/3; background: var(--c-surface-2); display:grid; place-items:center; border-radius: var(--r-lg); font-size:4rem;">📦</div>
             {% endif %}

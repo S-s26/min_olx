@@ -2,18 +2,18 @@
 {% block title %}<title>Messages — Mini-oLx</title>{% endblock %}
 
 {% block content %}
-<div class="molx-container" style="padding-top: 1rem; padding-bottom: 1rem; height: calc(100vh - 70px); display: flex; flex-direction: column;">
+<div class="molx-container" style="padding-top: 1rem; padding-bottom: 1rem; flex: 1; display: flex; flex-direction: column; min-height: 0;">
     <h1 style="margin: 0 0 1rem; font-size: 1.5rem;">Messages</h1>
 
     {% if chatroom %}
-        <div class="molx-chat molx-card" style="flex: 1; height: 100%; min-height: 0; overflow: hidden;">
+        <div class="molx-chat molx-card" style="flex: 1; height: auto; min-height: 0; overflow: hidden;">
                 <aside class="molx-chat__sidebar">
                     <div class="molx-chat__sidebar-header">Conversations</div>
                     {% for c in chatroom %}
                     <a href="{% url 'chat_detail' c.id %}" class="molx-chat__item {% if c.id == conversation.id %}is-active{% endif %}" style="color:inherit;">
                         <div class="molx-chat__item-avatar">{{ c.other_user.username|slice:":1"|upper }}</div>
                         <div class="molx-chat__item-meta">
-                            <div class="molx-chat__item-title">{{ c.other_user.username }} · {{ c.product.title }}</div>
+                            <div class="molx-chat__item-title">{{ c.other_user.username }} • {{ c.product.title }}</div>
                             <div class="molx-chat__item-sub">
                                 {% if c.last_message %}{{ c.last_message.message }}{% else %}No messages yet{% endif %}
                             </div>
@@ -24,6 +24,7 @@
 
                 <section class="molx-chat__main" style="height: 100%; display: flex; flex-direction: column; overflow: hidden;">
                     <header class="molx-chat__header">
+                        <a href="{% url 'chat_list' %}" class="mobile-only molx-btn molx-btn--ghost" style="padding: .4rem .6rem; margin-right: .5rem;">←</a>
                         <div class="molx-chat__item-avatar">{{ conversation.other_user.username|slice:":1"|upper }}</div>
                         <div>
                             <div class="molx-chat__header-title">{{ conversation.product.title }}</div>
